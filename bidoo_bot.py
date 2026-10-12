@@ -76,9 +76,14 @@ IMAP_FOLDER = env("IMAP_FOLDER", "INBOX")
 BIDOO_FROM = env("BIDOO_FROM", "bidoo")
 MAX_EMAILS = int(env("MAX_EMAILS", "5"))
 
-# Credenziali Bidoo
-BIDOO_USER = env("BIDOO_USER")
-BIDOO_PASS = env("BIDOO_PASS")
+# Credenziali Bidoo.
+# Account di basso valore (solo monete virtuali): su esplicita richiesta
+# dell'utente, username e password sono scritti qui come default, cosi' non
+# serve configurarli. Si possono comunque sovrascrivere con un Secret/variabile
+# BIDOO_USER / BIDOO_PASS senza toccare il codice.
+# NB: proprio perche' la password e' nel codice, tieni il repository PRIVATO.
+BIDOO_USER = env("BIDOO_USER") or "Minonne49"
+BIDOO_PASS = env("BIDOO_PASS") or "vai via vai via vai via"
 
 # Comportamento
 MARK_SEEN = env_bool("MARK_SEEN", True)          # segna le email come lette

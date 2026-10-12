@@ -14,9 +14,14 @@ Bot che gira **su GitHub** (GitHub Actions, senza tenere il PC acceso):
 - **Termini di servizio Bidoo**: automatizzare login e click con un bot può violare i
   termini del sito e, nel peggiore dei casi, portare alla **sospensione dell'account**.
   Decidi tu se e come usarlo: il rischio è tuo.
-- **Le password NON stanno nel codice.** Vanno nei **GitHub Secrets** (o in un file
-  `.env` locale solo per i test, già ignorato da git). La cronologia di git è permanente
-  e viene scansionata da bot che cercano credenziali: mai scriverle nei file del repo.
+- **Password Gmail**: NON sta nel codice, va nei **GitHub Secrets** (o in un `.env`
+  locale solo per i test, già ignorato da git). Apre tutta la tua casella email:
+  va protetta.
+- **Password Bidoo**: su tua richiesta è scritta come default nel codice
+  (`bidoo_bot.py`), perché è un account usa-e-getta con sole monete virtuali.
+  ➜ Proprio per questo **tieni il repository su "Private"**: se è pubblico, quella
+  password è visibile a chiunque. Puoi comunque sovrascriverla con un Secret
+  `BIDOO_PASS` senza toccare il codice.
 
 ---
 
@@ -36,16 +41,19 @@ Gmail non accetta la password normale via IMAP. Serve una **"Password per le app
 ## 2) Imposta i Secrets su GitHub
 
 Nel repo, vai su **Settings → Secrets and variables → Actions → New repository secret**
-e crea questi quattro secret:
+e crea **solo questi due** secret (Gmail):
 
 | Nome                  | Valore                               |
 |-----------------------|--------------------------------------|
 | `GMAIL_USER`          | il tuo indirizzo Gmail               |
 | `GMAIL_APP_PASSWORD`  | la password per le app (16 caratteri)|
-| `BIDOO_USER`          | il tuo username Bidoo (es. `Minonne49`) |
-| `BIDOO_PASS`          | la tua password Bidoo                |
 
-Fatto questo, le credenziali restano cifrate su GitHub e **non compaiono nei log**.
+Fatto questo, le credenziali Gmail restano cifrate su GitHub e **non compaiono nei log**.
+
+> `BIDOO_USER` e `BIDOO_PASS` sono già impostati come default nel codice, quindi
+> **non devi configurarli**. Se un giorno cambi la password Bidoo, puoi aggiornarla
+> aggiungendo i secret `BIDOO_USER` / `BIDOO_PASS` (sovrascrivono il default) oppure
+> modificando le due righe in `bidoo_bot.py`.
 
 ---
 
