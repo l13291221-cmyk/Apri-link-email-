@@ -1,0 +1,11 @@
+# Credenziali locali: NON devono MAI finire su git
+.env
+
+# Screenshot generati dal bot
+screenshots/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/

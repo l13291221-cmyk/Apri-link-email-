@@ -1,0 +1,67 @@
+name: Bidoo bot
+
+# Gira su GitHub (non serve tenere il PC acceso).
+on:
+  # Avvio manuale dal tab "Actions" -> "Bidoo bot" -> "Run workflow"
+  workflow_dispatch:
+
+  # Avvio automatico. ATTENZIONE: il cron di GitHub Actions e' in UTC
+  # e puo' partire con qualche minuto di ritardo (non e' garantito al secondo).
+  # L'Italia e' UTC+2 in estate (ora legale) e UTC+1 in inverno (ora solare):
+  #   - 17:35 UTC = 19:35 ora italiana in ESTATE
+  #   - 18:35 UTC = 19:35 ora italiana in INVERNO
+  # Il bot elabora solo le email Bidoo NON lette e poi le segna come lette,
+  # quindi un'esecuzione in piu' e' innocua. Se vuoi, cancella una delle due righe.
+  schedule:
+    - cron: '35 17 * * *'   # 19:35 ora italiana (ora legale / estate)
+    - cron: '35 18 * * *'   # 19:35 ora italiana (ora solare / inverno)
+
+# Evita esecuzioni sovrapposte
+concurrency:
+  group: bidoo-bot
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Chromium (Playwright)
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run Bidoo bot
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          BIDOO_USER: ${{ secrets.BIDOO_USER }}
+          BIDOO_PASS: ${{ secrets.BIDOO_PASS }}
+          # Opzioni facoltative (puoi anche impostarle come "Variables" del repo)
+          BIDOO_FROM: ${{ vars.BIDOO_FROM || 'bidoo' }}
+          MARK_SEEN: ${{ vars.MARK_SEEN || 'true' }}
+          CLICK_ALL: ${{ vars.CLICK_ALL || 'false' }}
+          DRY_RUN: ${{ vars.DRY_RUN || 'false' }}
+          HEADLESS: 'true'
+        run: python bidoo_bot.py
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/
+          if-no-files-found: ignore
+          retention-days: 7
